@@ -26,6 +26,14 @@
 #include "realsense-ui-advanced-mode.h"
 #include "fw-update-helper.h"
 
+#if  defined(USE_SDC30_TPG) && USE_SDC30_TPG
+#include <opencv2/opencv.hpp>
+extern cv::Mat m_matTestDepthImage;
+extern int16_t SDC30Phase0[];
+extern int16_t SDC30Phase90[];
+extern uint16_t SDC30Depth[];
+#endif
+
 ImVec4 from_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a, bool consistent_color = false);
 ImVec4 operator+(const ImVec4& c, float v);
 
@@ -676,7 +684,9 @@ namespace rs2
         bool auto_exposure_enabled = false;
         float depth_units = 1.f;
         float stereo_baseline = -1.f;
-
+#if defined(USE_SDC30_TPG) && USE_SDC30_TPG
+		float background_offset = 128.f;
+#endif
         bool roi_checked = false;
 
         std::atomic<bool> _pause;

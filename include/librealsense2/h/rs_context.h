@@ -97,6 +97,7 @@ rs2_device_list* rs2_query_devices(const rs2_context* context, rs2_error** error
 #define RS2_PRODUCT_LINE_T200           0x10
 #define RS2_PRODUCT_LINE_DEPTH      (RS2_PRODUCT_LINE_L500 | RS2_PRODUCT_LINE_SR300 | RS2_PRODUCT_LINE_D400)
 #define RS2_PRODUCT_LINE_TRACKING   RS2_PRODUCT_LINE_T200
+#define RS2_PRODUCT_LINE_SDC30          0x80
 
 /**
 * create a static snapshot of all connected devices at the time of the call

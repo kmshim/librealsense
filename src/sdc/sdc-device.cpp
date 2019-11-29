@@ -557,7 +557,7 @@ namespace librealsense
             }
 #endif
 #endif
-#if defined(USE_SKKU_TPG) && USE_SKKU_TPG
+#if defined(USE_SDC30_TPG) && USE_SDC30_TPG
 			depth_ep.register_pu(RS2_OPTION_BACKGROUND_OFFSET);
 			//depth_ep.register_pu(RS2_OPTION_GAMMA);
 #endif

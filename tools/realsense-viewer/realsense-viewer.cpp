@@ -242,9 +242,24 @@ bool refresh_devices(std::mutex& m,
     return true;
 }
 
+#if  defined(USE_SDC30_TPG) && USE_SDC30_TPG
+#include <opencv2/opencv.hpp>
+cv::Mat m_matTestDepthImage;
+int16_t SDC30Phase0[76800];
+int16_t SDC30Phase90[76800];
+uint16_t SDC30Depth[76800];
+#endif
+
 int main(int argc, const char** argv) try
 {
     rs2::log_to_console(RS2_LOG_SEVERITY_WARN);
+
+#if  defined(USE_SDC30_TPG) && USE_SDC30_TPG
+	cv::Mat img_out = cv::imread("SDC30_TPG_01.png", cv::IMREAD_COLOR); //default path: in the project file
+	cv::Rect myROI(8, 8, 320, 240);
+	cv::Mat croppedImage = img_out(myROI);
+	croppedImage.convertTo(m_matTestDepthImage, CV_8UC3);
+#endif
 
     ux_window window("Intel RealSense Viewer");
 

@@ -936,6 +936,14 @@ namespace rs2
         }
         catch (...) {}
 
+#if defined(USE_SDC30_TPG) && USE_SDC30_TPG
+		try
+		{
+			if (s->supports(RS2_OPTION_BACKGROUND_OFFSET))
+				background_offset = s->get_option(RS2_OPTION_BACKGROUND_OFFSET);
+		}
+		catch (...) {}
+#endif
         auto filters = s->get_recommended_filters();
         
         auto it  = std::find_if(filters.begin(), filters.end(), [&](const filter &f)
@@ -1625,6 +1633,14 @@ namespace rs2
 
                 if (next_option == RS2_OPTION_STEREO_BASELINE)
                     opt_md.dev->stereo_baseline = opt_md.value;
+
+#if defined(USE_SDC30_TPG) && USE_SDC30_TPG
+				if (next_option == RS2_OPTION_BACKGROUND_OFFSET)
+				{
+					opt_md.dev->background_offset = opt_md.value;
+				}
+#endif
+
             }
 
             next_option++;
@@ -3124,14 +3140,94 @@ namespace rs2
             }
         }
     }
+#if  defined(USE_SDC30_TPG) && USE_SDC30_TPG
+#define COEFF_C 299792458.0
+#define COEFF_T 20000.0
+#endif
 
     rs2::frame post_processing_filters::apply_filters(rs2::frame f, const rs2::frame_source& source)
     {
         std::vector<rs2::frame> frames;
         if (auto composite = f.as<rs2::frameset>())
         {
-            for (auto&& f : composite)
-                frames.push_back(f);
+			for (auto&& f : composite)
+			{
+#if defined(USE_SDC30_TPG) && USE_SDC30_TPG
+				uint32_t ui32PhaseIndexEven = 0;
+				uint32_t ui32PhaseIndexOdd = 0;
+				uint32_t ui32Offset = 0;
+				uint32_t ui32Temp = 0;
+				uint8_t ui8BackGroundOffset = 128;
+
+				auto sub = get_frame_origin(f);
+				if (sub)ui8BackGroundOffset = (uint8_t)(sub->background_offset);
+
+				for (int Vertical = 0; Vertical < 239; Vertical++)
+				{
+					for (int Horizontal = 0; Horizontal < 320; Horizontal++)
+					{
+						ui32Offset = Vertical * 320 + Horizontal;
+						ui32PhaseIndexOdd = (Vertical % 2) == 0 ? Vertical * 320 + Horizontal : (Vertical + 1) * 320 + Horizontal;
+						ui32PhaseIndexEven = (Vertical % 2) == 0 ? (Vertical + 1) * 320 + Horizontal : Vertical * 320 + Horizontal;
+						uint32_t iIndexEven = ui32PhaseIndexEven * 3;
+						uint32_t iIndexOdd = ui32PhaseIndexOdd * 3;
+
+
+
+						SDC30Phase0[ui32PhaseIndexEven] = (int8_t)(m_matTestDepthImage.data[iIndexEven] - ui8BackGroundOffset);
+						SDC30Phase90[ui32PhaseIndexOdd] = (int8_t)(m_matTestDepthImage.data[iIndexOdd] - ui8BackGroundOffset);
+
+						if ((SDC30Phase0[ui32PhaseIndexEven] >= 0) && (SDC30Phase90[ui32PhaseIndexOdd] >= 0))
+						{
+							if ((SDC30Phase0[ui32PhaseIndexEven] == 0) && (SDC30Phase90[ui32PhaseIndexOdd] == 0))
+							{
+								ui32Temp = 0;
+							}
+							else
+							{
+								ui32Temp =
+									(1.0 - (double)SDC30Phase0[ui32PhaseIndexEven] / (double)(abs(SDC30Phase0[ui32PhaseIndexEven]) + abs(SDC30Phase90[ui32PhaseIndexOdd])))* COEFF_C / (8.0 * COEFF_T);
+							}
+
+						}
+						else if ((SDC30Phase0[ui32PhaseIndexEven] < 0) && (SDC30Phase90[ui32PhaseIndexOdd] >= 0))
+						{
+							ui32Temp =
+								(1.0 + (double)SDC30Phase0[ui32PhaseIndexEven] / (double)(abs(SDC30Phase0[ui32PhaseIndexEven]) + abs(SDC30Phase90[ui32PhaseIndexOdd])))* COEFF_C / (8.0 * COEFF_T);
+						}
+						else if ((SDC30Phase0[ui32PhaseIndexEven] < 0) && (SDC30Phase90[ui32PhaseIndexOdd] < 0))
+						{
+							ui32Temp =
+								(3.0 + (double)SDC30Phase0[ui32PhaseIndexEven] / (double)(abs(SDC30Phase0[ui32PhaseIndexEven]) + abs(SDC30Phase90[ui32PhaseIndexOdd])))* COEFF_C / (8.0 * COEFF_T);
+						}
+						else if ((SDC30Phase0[ui32PhaseIndexEven] >= 0) && (SDC30Phase90[ui32PhaseIndexOdd] < 0))
+						{
+							ui32Temp =
+								(3.0 + (double)SDC30Phase0[ui32PhaseIndexEven] / (double)(abs(SDC30Phase0[ui32PhaseIndexEven]) + abs(SDC30Phase90[ui32PhaseIndexOdd])))* COEFF_C / (8.0 * COEFF_T);
+						}
+
+
+						if (ui32Temp > 65535)
+						{
+							SDC30Depth[ui32Offset] = ui32Temp - 65535;
+						}
+						else
+						{
+							SDC30Depth[ui32Offset] = ui32Temp;
+						}
+					}
+				}
+				cv::Mat matResult(240, 320, CV_16UC1);
+				memcpy(matResult.data, SDC30Depth, 320 * 240 * 2);
+				cv::Mat matDst;
+				cv::resize(matResult, matDst, cv::Size(matResult.cols * 1.0, matResult.rows * 1.0), 0, 0, cv::INTER_LINEAR);
+
+				const int w = f.as<rs2::depth_frame>().get_width();
+				const int h = f.as<rs2::depth_frame>().get_height();
+				memcpy((uint8_t *)f.get_data(), (void *)matDst.data, w*h * 2);
+#endif
+				frames.push_back(f);
+			}
         }
         else
             frames.push_back(f);

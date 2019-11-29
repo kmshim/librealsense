@@ -11,6 +11,7 @@
 #include "l500/l500-depth.h"
 #include "ivcam/sr300.h"
 #include "ds5/ds5-factory.h"
+#include "sdc/sdc-factory.h"
 #include "l500/l500-factory.h"
 #include "ds5/ds5-timestamp.h"
 #include "backend.h"
@@ -333,6 +334,12 @@ namespace librealsense
             auto ds5_devices = ds5_info::pick_ds5_devices(ctx, devices);
             std::copy(begin(ds5_devices), end(ds5_devices), std::back_inserter(list));
         }
+
+		if (mask & RS2_PRODUCT_LINE_SDC30)
+		{
+			auto sdc30_devices = sdc_info::pick_sdc_devices(ctx, devices);
+			std::copy(begin(sdc30_devices), end(sdc30_devices), std::back_inserter(list));
+		}
 
         auto l500_devices = l500_info::pick_l500_devices(ctx, devices);
         std::copy(begin(l500_devices), end(l500_devices), std::back_inserter(list));

@@ -226,7 +226,11 @@ namespace librealsense
         switch (value)
         {
             CASE(BACKLIGHT_COMPENSATION)
-            CASE(BRIGHTNESS)
+#if defined(USE_SDC30_TPG) && USE_SDC30_TPG
+			CASE(BACKGROUND_OFFSET)
+#else
+			CASE(BRIGHTNESS)
+#endif
             CASE(CONTRAST)
             CASE(EXPOSURE)
             CASE(GAIN)

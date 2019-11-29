@@ -4,6 +4,7 @@
 #include <cstring>
 #include "ros_reader.h"
 #include "ds5/ds5-device.h"
+#include "sdc/sdc-device.h"
 #include "ivcam/sr300.h"
 #include "l500/l500-depth.h"
 #include "proc/disparity-transform.h"
@@ -873,6 +874,23 @@ namespace librealsense
 
         return it != rs400_sku_pid.end();
     }
+
+	bool ros_reader::is_sdc_PID(int pid)
+	{
+		using namespace sdc;
+
+		std::vector<int> sdc_PIDs =
+		{
+			SDC30_PID
+		};
+
+		auto it = std::find_if(sdc_PIDs.begin(), sdc_PIDs.end(), [&](int sdc_pid)
+		{
+			return pid == sdc_pid;
+		});
+
+		return it != sdc_PIDs.end();
+	}
 
     bool ros_reader::is_sr300_PID(int pid)
     {
