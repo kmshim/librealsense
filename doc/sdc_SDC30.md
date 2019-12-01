@@ -15,5 +15,5 @@ SDC30은 10bit depth와 320x240의 resolution을 지원한다.
 * USE_XU_UNIT=1 -> UVC Extension Unit을 사용한다.
 * USE_SDC30_TPG=0 -> Depth image를 이용하여 단순히 디버깅하기 위함. --> 삭제할 예정임.
 * USE_SDC30_TPG=1 -> SDC30 카메라로 부터 실제 depth image를 받아서 처리한다.
-* USE_SDC30_UPSCALE_TO_VGA_DEB=0 -> QVGA used.
-* USE_SDC30_UPSCALE_TO_VGA_DEB=1 -> QVGA to VGA upscaling used.(가능한 것인지 확인하기 위한 용도이면, 최종적으로 사용하지 않을 예정임.)
+* USE_SDC30_UPSCALE_TO_VGA_DEBUG=0 -> QVGA used.
+* USE_SDC30_UPSCALE_TO_VGA_DEBUG=1 -> QVGA to VGA upscaling used.(가능한 것인지 확인하기 위한 용도이면, 최종적으로 사용하지 않을 예정임.)
