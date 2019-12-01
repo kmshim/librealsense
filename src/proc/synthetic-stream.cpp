@@ -266,7 +266,11 @@ namespace librealsense
             data.system_time = _actual_source.get_time();
             data.is_blocking = original->is_blocking();
 
+#if defined(USE_SDC30_UPSCALE_TO_VGA_DEBUG) && USE_SDC30_UPSCALE_TO_VGA_DEBUG
+			auto res = _actual_source.alloc_frame(frame_type, vid_stream->get_width() * 2 * vid_stream->get_height() * 2 * sizeof(float) * 5, data, true);
+#else
             auto res = _actual_source.alloc_frame(frame_type, vid_stream->get_width() * vid_stream->get_height() * sizeof(float) * 5, data, true);
+#endif
             if (!res) throw wrong_api_call_sequence_exception("Out of frame resources!");
             res->set_sensor(original->get_sensor());
             res->set_stream(stream);

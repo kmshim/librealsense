@@ -1017,7 +1017,11 @@ namespace rs2
                 std::stringstream res;
                 if (auto vid_prof = profile.as<video_stream_profile>())
                 {
+#if defined(USE_SDC30_UPSCALE_TO_VGA_DEBUG) && USE_SDC30_UPSCALE_TO_VGA_DEBUG
+					res << vid_prof.width() * 2 << " x " << vid_prof.height() * 2;
+#else
                     res << vid_prof.width() << " x " << vid_prof.height();
+#endif
                     push_back_if_not_exists(res_values, std::pair<int, int>(vid_prof.width(), vid_prof.height()));
                     push_back_if_not_exists(resolutions, res.str());
                 }
@@ -3239,7 +3243,11 @@ namespace rs2
 				cv::Mat matResult(240, 320, CV_16UC1);
 				memcpy(matResult.data, SDC30Depth, 320 * 240 * 2);
 				cv::Mat matDst;
+#if defined(USE_SDC30_UPSCALE_TO_VGA_DEBUG) && USE_SDC30_UPSCALE_TO_VGA_DEBUG
+				cv::resize(matResult, matDst, cv::Size(matResult.cols * 2.0, matResult.rows * 2.0), 0, 0, cv::INTER_LINEAR);
+#else
 				cv::resize(matResult, matDst, cv::Size(matResult.cols * 1.0, matResult.rows * 1.0), 0, 0, cv::INTER_LINEAR);
+#endif
 
 				const int w = f.as<rs2::depth_frame>().get_width();
 				const int h = f.as<rs2::depth_frame>().get_height();

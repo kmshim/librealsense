@@ -505,8 +505,11 @@ namespace librealsense
 
                         last_frame_number = frame_counter;
                         last_timestamp = timestamp;
-
+#if defined(USE_SDC30_UPSCALE_TO_VGA_DEBUG) && USE_SDC30_UPSCALE_TO_VGA_DEBUG
+						auto res = output.stream_resolution({ mode.profile.width * 2, mode.profile.height * 2 });
+#else
                         auto res = output.stream_resolution({ mode.profile.width, mode.profile.height });
+#endif
                         auto width = res.width;
                         auto height = res.height;
 

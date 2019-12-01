@@ -85,8 +85,12 @@ namespace librealsense
             auto stream_profile = depth.get_profile();
             if (auto video = stream_profile.as<rs2::video_stream_profile>())
             {
-                _depth_intrinsics = video.get_intrinsics();
-                _pixels_map.resize(_depth_intrinsics->height*_depth_intrinsics->width);
+				_depth_intrinsics = video.get_intrinsics();
+#if defined(USE_SDC30_UPSCALE_TO_VGA_DEBUG) && USE_SDC30_UPSCALE_TO_VGA_DEBUG
+				_pixels_map.resize(_depth_intrinsics->height * 2 * _depth_intrinsics->width * 2);
+#else
+				_pixels_map.resize(_depth_intrinsics->height*_depth_intrinsics->width);
+#endif
                 _occlusion_filter->set_depth_intrinsics(_depth_intrinsics.value());
 
                 preprocess();
@@ -124,7 +128,11 @@ namespace librealsense
             auto stream_profile = _other_stream.get_profile();
             if (auto video = stream_profile.as<rs2::video_stream_profile>())
             {
+#if defined(USE_SDC30_UPSCALE_TO_VGA_DEBUG) && USE_SDC30_UPSCALE_TO_VGA_DEBUG
+				//
+#else
                 _other_intrinsics = video.get_intrinsics();
+#endif
                 _occlusion_filter->set_texel_intrinsics(_other_intrinsics.value());
             }
         }
@@ -201,6 +209,14 @@ namespace librealsense
             auto height = vid_frame.get_height();
             auto width = vid_frame.get_width();
 
+#if defined(USE_SDC30_UPSCALE_TO_VGA_DEBUG) && USE_SDC30_UPSCALE_TO_VGA_DEBUG
+			mapped_intr.fx *= 2.0;
+			mapped_intr.fy *= 2.0;
+			mapped_intr.ppx *= 2.0;
+			mapped_intr.ppy *= 2.0;
+			mapped_intr.width *= 2.0;
+			mapped_intr.height *= 2.0;
+#endif
             get_texture_map(res, points, width, height, mapped_intr, extr, pixels_ptr);
 
             if (_occlusion_filter->active())
