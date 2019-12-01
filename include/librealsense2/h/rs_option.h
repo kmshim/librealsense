@@ -23,10 +23,11 @@ extern "C" {
     {
         RS2_OPTION_BACKLIGHT_COMPENSATION, /**< Enable / disable color backlight compensation*/
         RS2_OPTION_BRIGHTNESS, /**< Color image brightness*/
+		RS2_OPTION_CONTRAST, /**< Color image contrast*/
 #if defined(USE_SDC30_TPG) && USE_SDC30_TPG
 		RS2_OPTION_BACKGROUND_OFFSET = RS2_OPTION_BRIGHTNESS, /**< Adjust background offset */
+		RS2_OPTION_PHASE_ALIGNMENT = RS2_OPTION_CONTRAST,
 #endif
-        RS2_OPTION_CONTRAST, /**< Color image contrast*/
         RS2_OPTION_EXPOSURE, /**< Controls exposure time of color camera. Setting any value will disable auto exposure*/
         RS2_OPTION_GAIN, /**< Color image gain*/
         RS2_OPTION_GAMMA, /**< Color image gamma setting*/

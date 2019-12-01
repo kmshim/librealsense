@@ -686,6 +686,7 @@ namespace rs2
         float stereo_baseline = -1.f;
 #if defined(USE_SDC30_TPG) && USE_SDC30_TPG
 		float background_offset = 128.f;
+		float phase_alignment = 0.f;
 #endif
         bool roi_checked = false;
 

@@ -18,8 +18,8 @@
 #include "sdc-timestamp.h"
 #include "sdc-rolling-shutter.h"
 #include "sdc-active.h"
-#include "sdc-color.h"
-#include "sdc-motion.h"
+//#include "sdc-color.h"
+//#include "sdc-motion.h"
 #include "sync.h"
 
 namespace librealsense

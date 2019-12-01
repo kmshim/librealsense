@@ -228,10 +228,12 @@ namespace librealsense
             CASE(BACKLIGHT_COMPENSATION)
 #if defined(USE_SDC30_TPG) && USE_SDC30_TPG
 			CASE(BACKGROUND_OFFSET)
+			CASE(PHASE_ALIGNMENT)
 #else
 			CASE(BRIGHTNESS)
+			CASE(CONTRAST)
 #endif
-            CASE(CONTRAST)
+            
             CASE(EXPOSURE)
             CASE(GAIN)
             CASE(GAMMA)

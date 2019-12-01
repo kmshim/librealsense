@@ -943,6 +943,13 @@ namespace rs2
 				background_offset = s->get_option(RS2_OPTION_BACKGROUND_OFFSET);
 		}
 		catch (...) {}
+
+		try
+		{
+			if (s->supports(RS2_OPTION_PHASE_ALIGNMENT))
+				background_offset = s->get_option(RS2_OPTION_PHASE_ALIGNMENT);
+		}
+		catch (...) {}
 #endif
         auto filters = s->get_recommended_filters();
         
@@ -1638,6 +1645,10 @@ namespace rs2
 				if (next_option == RS2_OPTION_BACKGROUND_OFFSET)
 				{
 					opt_md.dev->background_offset = opt_md.value;
+				}
+				if (next_option == RS2_OPTION_PHASE_ALIGNMENT)
+				{
+					opt_md.dev->phase_alignment = opt_md.value;
 				}
 #endif
 
@@ -3158,21 +3169,29 @@ namespace rs2
 				uint32_t ui32Offset = 0;
 				uint32_t ui32Temp = 0;
 				uint8_t ui8BackGroundOffset = 128;
+				bool bPhaseAlignment = 0; 
 
 				auto sub = get_frame_origin(f);
 				if (sub)ui8BackGroundOffset = (uint8_t)(sub->background_offset);
-
+				if (sub)bPhaseAlignment = (sub->phase_alignment == 0.f) ? true : false;
 				for (int Vertical = 0; Vertical < 239; Vertical++)
 				{
 					for (int Horizontal = 0; Horizontal < 320; Horizontal++)
 					{
 						ui32Offset = Vertical * 320 + Horizontal;
-						ui32PhaseIndexOdd = (Vertical % 2) == 0 ? Vertical * 320 + Horizontal : (Vertical + 1) * 320 + Horizontal;
-						ui32PhaseIndexEven = (Vertical % 2) == 0 ? (Vertical + 1) * 320 + Horizontal : Vertical * 320 + Horizontal;
+						if (bPhaseAlignment)
+						{
+							ui32PhaseIndexEven = (Vertical % 2) == 0 ? Vertical * 320 + Horizontal : (Vertical + 1) * 320 + Horizontal;
+							ui32PhaseIndexOdd = (Vertical % 2) == 0 ? (Vertical + 1) * 320 + Horizontal : Vertical * 320 + Horizontal;
+						}
+						else
+						{
+							ui32PhaseIndexOdd = (Vertical % 2) == 0 ? Vertical * 320 + Horizontal : (Vertical + 1) * 320 + Horizontal;
+							ui32PhaseIndexEven = (Vertical % 2) == 0 ? (Vertical + 1) * 320 + Horizontal : Vertical * 320 + Horizontal;
+						}
+
 						uint32_t iIndexEven = ui32PhaseIndexEven * 3;
 						uint32_t iIndexOdd = ui32PhaseIndexOdd * 3;
-
-
 
 						SDC30Phase0[ui32PhaseIndexEven] = (int8_t)(m_matTestDepthImage.data[iIndexEven] - ui8BackGroundOffset);
 						SDC30Phase90[ui32PhaseIndexOdd] = (int8_t)(m_matTestDepthImage.data[iIndexOdd] - ui8BackGroundOffset);

@@ -92,10 +92,11 @@ const char* librealsense::uvc_pu_option::get_description() const
     case RS2_OPTION_BACKLIGHT_COMPENSATION: return "Enable / disable backlight compensation";
 #if defined(USE_SDC30_TPG) && USE_SDC30_TPG
 	case RS2_OPTION_BACKGROUND_OFFSET: return "Adjust background offset";
+	case RS2_OPTION_PHASE_ALIGNMENT: return "Adjust phase alignment, 0: Evne line fist, 1: Odd line first";
 #else
 	case RS2_OPTION_BRIGHTNESS: return "UVC image brightness";
+	case RS2_OPTION_CONTRAST: return "UVC image contrast";
 #endif
-    case RS2_OPTION_CONTRAST: return "UVC image contrast";
     case RS2_OPTION_EXPOSURE: return "Controls exposure time of color camera. Setting any value will disable auto exposure";
     case RS2_OPTION_GAIN: return "UVC image gain";
     case RS2_OPTION_GAMMA: return "UVC image gamma setting";

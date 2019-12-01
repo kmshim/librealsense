@@ -19,7 +19,7 @@
 #include "sdc-timestamp.h"
 #include "stream.h"
 #include "environment.h"
-#include "sdc-color.h"
+//#include "sdc-color.h"
 #include "sdc-rolling-shutter.h"
 
 #include "proc/decimation-filter.h"
@@ -119,7 +119,7 @@ namespace librealsense
 
             auto results = uvc_sensor::init_stream_profiles();
 
-            auto color_dev = dynamic_cast<const sdc_color*>(&get_device());
+            //auto color_dev = dynamic_cast<const sdc_color*>(&get_device());
             auto rolling_shutter_dev = dynamic_cast<const sdc_rolling_shutter*>(&get_device());
 
             std::vector< video_stream_profile_interface*> depth_candidates;
@@ -559,7 +559,7 @@ namespace librealsense
 #endif
 #if defined(USE_SDC30_TPG) && USE_SDC30_TPG
 			depth_ep.register_pu(RS2_OPTION_BACKGROUND_OFFSET);
-			//depth_ep.register_pu(RS2_OPTION_GAMMA);
+			depth_ep.register_pu(RS2_OPTION_PHASE_ALIGNMENT);
 #endif
 
 			if (_fw_version >= firmware_version("20.11.7.0"))
